@@ -56,8 +56,9 @@ def iterate_gauge(mapping):
     labels_df.to_csv(LABELS_CSV, index=False)
 
 
-def generate_all_needles(step=1.0):
+def generate_all_needles(step=0.5):
     for angle in np.arange(0, 274.5, step):
+        print(angle)
         make_needles(angle)
 
 # adjust this according to your gauge (value:angle)
