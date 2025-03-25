@@ -1,8 +1,7 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models
 import pandas as pd
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
@@ -14,7 +13,7 @@ LABELS_CSV = 'images/generated/labels.csv'
 # Image parameters
 IMG_HEIGHT = 224
 IMG_WIDTH = 224
-CHANNELS = 3
+CHANNELS = 1
 
 # Read labels CSV
 labels_df = pd.read_csv(LABELS_CSV)
@@ -23,10 +22,12 @@ labels_df['filename'] = labels_df['filename'].apply(lambda x: os.path.join(IMAGE
 
 # Prepare images and labels
 def load_image(image_path):
-    img = Image.open(image_path).convert('RGB')
-    img = img.resize((IMG_WIDTH, IMG_HEIGHT))
-    img = np.array(img) / 255.0  # Normalize to [0, 1]
-    return img
+    image = Image.open(image_path)
+    image = image.convert("L")  # Convert to grayscale
+    image = image.filter(ImageFilter.FIND_EDGES)
+    image = image.resize((IMG_WIDTH, IMG_HEIGHT))
+    image = np.array(image, dtype=np.float32) / 255.0  # Normalize
+    return image
 
 
 images = np.array([load_image(img_path) for img_path in labels_df['filename']])
@@ -39,27 +40,25 @@ labels = scaler.fit_transform(labels)
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=42)
 
-model = models.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-    layers.MaxPooling2D((2, 2)),
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+    tf.keras.layers.MaxPooling2D((2, 2)),
 
-    layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
 
-    layers.Conv2D(128, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
 
-    layers.Conv2D(256, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
 
-    layers.Flatten(),
-    layers.Dense(256, activation='relu'),
-    layers.Dropout(0.5),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
 
-    layers.Dense(128, activation='relu'),
-    layers.Dropout(0.5),
-
-    layers.Dense(1)  # Single output neuron for regression
+    tf.keras.layers.Dense(1)  # Single output neuron for regression
 ])
 
 model.compile(optimizer='adam',
