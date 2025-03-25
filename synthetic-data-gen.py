@@ -8,7 +8,7 @@ NEEDLES_PATH = 'images/generated/needles/needle_rot_{0}.png'
 EDA_GAUGES = 'images/generated/gauges/{0}'
 LABELS_CSV = 'images/generated/labels.csv'
 
-def make_needles(angle: float):
+def make_needles(angle):
     img = Image.open('./images/needle_rot_0.png')
     rotated_img = img.rotate(-angle, expand=True, resample=Image.BICUBIC)
 
@@ -27,7 +27,7 @@ def make_needles(angle: float):
     cropped_img.save(filename)
 
 
-def save_gauge(item: float, num: float, labels: list):
+def save_gauge(item, num, labels):
     img_gauge = Image.open(GAUGE, 'r')
 
     # Open the corresponding needle image
@@ -46,7 +46,7 @@ def save_gauge(item: float, num: float, labels: list):
     labels.append({'filename': eda_name, 'regression_label': num, 'classification_label': int(num)})
 
 
-def iterate_gauge(mapping: dict):
+def iterate_gauge(mapping):
     labels = []
     for idx, item in enumerate(mapping):
         save_gauge(mapping[item], item, labels)
