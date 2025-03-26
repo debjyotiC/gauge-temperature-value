@@ -53,17 +53,11 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-
-    tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-
     tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(256, activation='relu'),
+
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(labels.shape[1], activation='softmax')
+    tf.keras.layers.Dense(6, activation='softmax')
 ])
 
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='categorical_crossentropy',
@@ -72,14 +66,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='cat
 # Print model summary
 model.summary()
 
-# Train the model
-EPOCHS = 100
-BATCH_SIZE = 32
-
-history = model.fit(X_train, y_train,
-                    epochs=EPOCHS,
-                    batch_size=BATCH_SIZE,
-                    validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
@@ -111,9 +98,6 @@ axs[1].grid(True)
 axs[1].legend(loc='best')
 plt.show()
 
-# Load the best model if saved separately
-# model = tf.keras.models.load_model('models/best-model-lmfe.keras')
-
 # Model predictions
 y_pred = model.predict(X_test)
 y_test_labels = np.argmax(y_test, axis=1)
@@ -125,14 +109,19 @@ clf_report = classification_report(y_test_labels, y_pred_labels)
 print(clf_report)
 
 # Get class names from LabelBinarizer
-class_names = label_binarizer.classes_
+class_names = label_binarizer.classes_  # Ensures the correct number of labels
 
 # Plot confusion matrix heatmap
 ax = plt.subplot()
-sns.heatmap(results, annot=True, cmap='Blues', annot_kws={"size": 10}, ax=ax, fmt='g')
+sns.heatmap(results, annot=True, cmap='Blues', annot_kws={"size": 20}, ax=ax, fmt='g')
 plt.title(f"Gauge Classification Accuracy: {test_acc:.2f}")
 ax.set_xlabel('Predicted labels', fontsize=12)
 ax.set_ylabel('True labels', fontsize=12)
+# Ensure the number of ticks matches the classes
+ax.set_xticks(np.arange(len(class_names)))
+ax.set_yticks(np.arange(len(class_names)))
 ax.xaxis.set_ticklabels(class_names, fontsize=10, rotation=90)
 ax.yaxis.set_ticklabels(class_names, fontsize=10, rotation=0)
+plt.savefig("images/confusion_matrix.png", dpi=600)
 plt.show()
+
