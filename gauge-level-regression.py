@@ -45,41 +45,28 @@ X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.
 
 # Define Model
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+    tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-
-    tf.keras.layers.Conv2D(256, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-
     tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(256, activation='relu'),
+
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dropout(0.5),
 
     tf.keras.layers.Dense(1)  # Single output neuron for regression
 ])
 
-model.compile(optimizer='adam',
-              loss='mean_squared_error',
-              metrics=['mae'])  # Mean Absolute Error as additional metric
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])  # Mean Absolute Error as additional metric
 
 # Print the model summary
 model.summary()
 
-# Train the model
-EPOCHS = 100
-BATCH_SIZE = 32
 
-history = model.fit(X_train, y_train,
-                    epochs=EPOCHS,
-                    batch_size=BATCH_SIZE,
-                    validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate the model
 test_loss, test_mae = model.evaluate(X_test, y_test)
@@ -127,3 +114,4 @@ axs[1].legend(loc='best')
 plt.tight_layout()
 plt.savefig("images/metrics.png", dpi=300)
 plt.show()
+

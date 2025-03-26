@@ -14,8 +14,8 @@ IMAGES_PATH = 'images/generated/gauges/'
 LABELS_CSV = 'images/generated/labels.csv'
 
 # Image parameters
-IMG_HEIGHT = 224
-IMG_WIDTH = 224
+IMG_HEIGHT = 96
+IMG_WIDTH = 96
 CHANNELS = 1
 
 # Read labels CSV
@@ -47,7 +47,8 @@ X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.
 
 # Model definition
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+    tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
