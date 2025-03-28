@@ -13,8 +13,8 @@ IMAGES_PATH = 'images/generated/gauges/'
 LABELS_CSV = 'images/generated/labels.csv'
 
 # Image parameters
-IMG_HEIGHT = 224
-IMG_WIDTH = 224
+IMG_HEIGHT = 28
+IMG_WIDTH = 28
 CHANNELS = 1
 
 # Read labels CSV
@@ -46,21 +46,20 @@ X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.
 # Define Model
 model = tf.keras.models.Sequential([
     tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(12, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Flatten(),
 
-    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(20, activation='relu'),
     tf.keras.layers.Dropout(0.5),
-
     tf.keras.layers.Dense(1)  # Single output neuron for regression
 ])
 
-model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])  # Mean Absolute Error as additional metric
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error', metrics=['mae'])  # Mean Absolute Error as additional metric
 
 # Print the model summary
 model.summary()
@@ -113,5 +112,14 @@ axs[1].legend(loc='best')
 
 plt.tight_layout()
 plt.savefig("images/metrics.png", dpi=300)
-plt.show()
+# plt.show()
 
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')  # Ideal line
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Actual vs. Predicted Values')
+plt.grid(True)
+plt.savefig("images/pred_vs_actual.png", dpi=300)
+plt.show()

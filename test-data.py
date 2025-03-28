@@ -10,8 +10,9 @@ gauge_images = listdir(im_path)
 for im in gauge_images:
     full_path = join(im_path, im)
     image = Image.open(full_path)
-    image = image.convert("L")
-    image = image.filter(ImageFilter.FIND_EDGES)
+    # image = image.convert("L")
+    # image = image.filter(ImageFilter.FIND_EDGES)
+    image = image.resize((28, 28))
     class_name = im.split("-")
 
     print(class_name)

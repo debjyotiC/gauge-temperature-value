@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 import pandas as pd
 
 NEEDLE = 'images/reference/needle.png'
@@ -42,8 +42,15 @@ def save_gauge(item, num, labels):
     eda_name = f"gauge_{str(num).replace('.', '-')}.png"
     img_copy.save(EDA_GAUGES.format(eda_name))
 
+    # Create and save edge-detected image
+    img_edges = img_copy.convert("L").filter(ImageFilter.FIND_EDGES)
+    eda_edge_name = f"gauge_{str(num).replace('.', '-')}_edges.png"
+    img_edges.save(EDA_GAUGES.format(eda_edge_name))
+
     # Add label information
     labels.append({'filename': eda_name, 'regression_label': num, 'classification_label': int(num)})
+    # labels.append({'filename': eda_edge_name, 'regression_label': num, 'classification_label': int(num)})
+
 
 
 def iterate_gauge(mapping):

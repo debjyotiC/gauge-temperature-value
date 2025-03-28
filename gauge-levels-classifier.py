@@ -14,8 +14,8 @@ IMAGES_PATH = 'images/generated/gauges/'
 LABELS_CSV = 'images/generated/labels.csv'
 
 # Image parameters
-IMG_HEIGHT = 96
-IMG_WIDTH = 96
+IMG_HEIGHT = 28
+IMG_WIDTH = 28
 CHANNELS = 1
 
 # Read labels CSV
@@ -48,15 +48,15 @@ X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.
 # Model definition
 model = tf.keras.models.Sequential([
     tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(12, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Flatten(),
 
-    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(20, activation='relu'),
     tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(6, activation='softmax')
 ])
@@ -67,7 +67,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='cat
 # Print model summary
 model.summary()
 
-history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
