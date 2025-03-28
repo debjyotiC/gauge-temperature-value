@@ -55,7 +55,7 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
 
     tf.keras.layers.Dense(20, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dropout(0.25),
     tf.keras.layers.Dense(1)  # Single output neuron for regression
 ])
 
