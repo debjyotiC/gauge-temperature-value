@@ -1,0 +1,6 @@
+tensorflow
+scikit-learn
+pillow
+pandas
+matplotlib
+seaborn

@@ -43,7 +43,7 @@ label_binarizer = LabelBinarizer()
 labels = label_binarizer.fit_transform(labels)
 
 # Train-test split
-X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.3, random_state=42)
 
 # Model definition
 model = tf.keras.models.Sequential([
@@ -57,7 +57,7 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
 
     tf.keras.layers.Dense(20, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dropout(0.25),
     tf.keras.layers.Dense(6, activation='softmax')
 ])
 
