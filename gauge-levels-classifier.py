@@ -18,7 +18,7 @@ LABELS_CSV = 'images/generated/labels.csv'
 IMG_HEIGHT = 28
 IMG_WIDTH = 28
 CHANNELS = 1
-BATCH_SIZE = 20
+BATCH_SIZE = 10
 
 # Read labels CSV
 labels_df = pd.read_csv(LABELS_CSV)
@@ -72,8 +72,8 @@ model = tf.keras.models.Sequential([
 
     tf.keras.layers.Flatten(),
 
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(70, activation='relu'),
+    tf.keras.layers.Dropout(0.25),
     tf.keras.layers.Dense(6, activation='softmax')
 ])
 
@@ -83,7 +83,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='cat
 # Print model summary
 model.summary()
 
-history = model.fit(train_generator, epochs=300, validation_data=test_generator)
+history = model.fit(train_generator, epochs=500, validation_data=test_generator)
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
