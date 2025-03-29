@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
 
+
 # Paths to images and labels
 IMAGES_PATH = 'images/generated/gauges/'
 LABELS_CSV = 'images/generated/labels.csv'
@@ -17,6 +18,7 @@ LABELS_CSV = 'images/generated/labels.csv'
 IMG_HEIGHT = 28
 IMG_WIDTH = 28
 CHANNELS = 1
+BATCH_SIZE = 20
 
 # Read labels CSV
 labels_df = pd.read_csv(LABELS_CSV)
@@ -45,19 +47,33 @@ labels = label_binarizer.fit_transform(labels)
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.3, random_state=42)
 
+# Data Augmentation
+datagen_train = tf.keras.preprocessing.image.ImageDataGenerator(
+    rotation_range=10,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    zoom_range=0.1,
+    horizontal_flip=True
+)
+
+datagen_test = tf.keras.preprocessing.image.ImageDataGenerator()
+
+train_generator = datagen_train.flow(X_train, y_train, batch_size=BATCH_SIZE)
+test_generator = datagen_test.flow(X_test, y_test, batch_size=BATCH_SIZE)
+
 # Model definition
 model = tf.keras.models.Sequential([
     tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-    tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Conv2D(12, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(20, (5, 5), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Flatten(),
 
-    tf.keras.layers.Dense(20, activation='relu'),
-    tf.keras.layers.Dropout(0.25),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.3),
     tf.keras.layers.Dense(6, activation='softmax')
 ])
 
@@ -67,7 +83,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='cat
 # Print model summary
 model.summary()
 
-history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(train_generator, epochs=300, validation_data=test_generator)
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
