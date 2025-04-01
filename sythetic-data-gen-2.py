@@ -86,4 +86,4 @@ gaugeDegreeMap = {
 }
 
 generate_all_needles()
-iterate_gauge(gaugeDegreeMap, variation=10)  # Generate 10 variations per gauge level
+iterate_gauge(gaugeDegreeMap, variation=20)  # Generate 10 variations per gauge level
