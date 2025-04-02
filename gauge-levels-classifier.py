@@ -83,6 +83,8 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='cat
 # Print model summary
 model.summary()
 
+model.save("models/gauge-classifier.keras")
+
 history = model.fit(train_generator, epochs=500, validation_data=test_generator)
 
 # Evaluate the model
