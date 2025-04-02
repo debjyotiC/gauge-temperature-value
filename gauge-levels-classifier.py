@@ -62,20 +62,35 @@ train_generator = datagen_train.flow(X_train, y_train, batch_size=BATCH_SIZE)
 test_generator = datagen_test.flow(X_test, y_test, batch_size=BATCH_SIZE)
 
 # Model definition
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-    tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
+# model = tf.keras.models.Sequential([
+#     tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+#     tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
+#     tf.keras.layers.MaxPooling2D((2, 2)),
+#
+#     tf.keras.layers.Conv2D(20, (5, 5), activation='relu'),
+#     tf.keras.layers.MaxPooling2D((2, 2)),
+#
+#     tf.keras.layers.Flatten(),
+#
+#     tf.keras.layers.Dense(70, activation='relu'),
+#     tf.keras.layers.Dropout(0.25),
+#     tf.keras.layers.Dense(6, activation='softmax')
+# ])
 
-    tf.keras.layers.Conv2D(20, (5, 5), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Flatten(),
+classifier_input = tf.keras.layers.Input(shape=(28, 28, 1), name="img")
+x = tf.keras.layers.Conv2D(32, (5, 5), activation='relu')(classifier_input)
+x = tf.keras.layers.MaxPooling2D((2, 2))(x)
 
-    tf.keras.layers.Dense(70, activation='relu'),
-    tf.keras.layers.Dropout(0.25),
-    tf.keras.layers.Dense(6, activation='softmax')
-])
+x = tf.keras.layers.Conv2D(20, (5, 5), activation='relu')(x)
+x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+x = tf.keras.layers.Flatten()(x)
+x = tf.keras.layers.Dense(70, activation='relu')(x)
+x = tf.keras.layers.Dropout(0.25)(x)
+classifier_output = tf.keras.layers.Dense(6, activation='softmax')(x)
+
+model = tf.keras.Model(classifier_input, classifier_output, )
 
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='categorical_crossentropy',
               metrics=['accuracy'])
