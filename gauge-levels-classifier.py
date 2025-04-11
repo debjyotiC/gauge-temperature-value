@@ -18,7 +18,7 @@ LABELS_CSV = 'images/generated/labels.csv'
 IMG_HEIGHT = 28
 IMG_WIDTH = 28
 CHANNELS = 1
-BATCH_SIZE = 10
+BATCH_SIZE = 20
 
 # Read labels CSV
 labels_df = pd.read_csv(LABELS_CSV)
@@ -86,9 +86,9 @@ x = tf.keras.layers.Conv2D(20, (5, 5), activation='relu')(x)
 x = tf.keras.layers.MaxPooling2D((2, 2))(x)
 
 x = tf.keras.layers.Flatten()(x)
-x = tf.keras.layers.Dense(70, activation='relu')(x)
+x = tf.keras.layers.Dense(100, activation='relu')(x)
 x = tf.keras.layers.Dropout(0.25)(x)
-classifier_output = tf.keras.layers.Dense(6, activation='softmax')(x)
+classifier_output = tf.keras.layers.Dense(5, activation='softmax')(x)
 
 model = tf.keras.Model(classifier_input, classifier_output, )
 

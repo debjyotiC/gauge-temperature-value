@@ -4,8 +4,8 @@ import pandas as pd
 import random
 import os
 
-NEEDLE = 'images/reference/needle.png'
-GAUGE = 'images/reference/gauge.png'
+NEEDLE = 'images/reference/gauge-needle.png'
+GAUGE = 'images/reference/gauge-dial.png'
 NEEDLES_PATH = 'images/generated/needles/needle_rot_{0}.png'
 EDA_GAUGES = 'images/generated/gauges/{0}'
 LABELS_CSV = 'images/generated/labels.csv'
@@ -80,10 +80,16 @@ def generate_all_needles(step=0.1):
     for angle in np.arange(0, 274.5, step):
         make_needles(angle)
 
-# Gauge mapping
+# Gauge mapping for 0 to 6
+# gaugeDegreeMap = {
+#     i / 10: round(i * 4.5 / 10, 1) for i in range(61)
+# }
+
+# Gauge mapping for 0 to 150 with angle from 0 to 270
 gaugeDegreeMap = {
-    i / 10: round(i * 4.5 / 10, 1) for i in range(61)
+    i: round(i * 1.8, 1) for i in range(5)
 }
 
+
 generate_all_needles()
-iterate_gauge(gaugeDegreeMap, variation=20)  # Generate 10 variations per gauge level
+iterate_gauge(gaugeDegreeMap, variation=100)  # Generate 10 variations per gauge level

@@ -16,7 +16,7 @@ LABELS_CSV = 'images/generated/labels.csv'
 IMG_HEIGHT = 28
 IMG_WIDTH = 28
 CHANNELS = 1
-BATCH_SIZE = 10
+BATCH_SIZE = 20
 
 # Read labels CSV
 labels_df = pd.read_csv(LABELS_CSV)
@@ -69,7 +69,7 @@ model = tf.keras.models.Sequential([
 
     tf.keras.layers.Flatten(),
 
-    tf.keras.layers.Dense(70, activation='relu'),
+    tf.keras.layers.Dense(100, activation='relu'),
     tf.keras.layers.Dropout(0.25),
     tf.keras.layers.Dense(1)  # Single output neuron for regression
 ])
