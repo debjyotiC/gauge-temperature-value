@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 # Paths to images and labels
 IMAGES_PATH = 'images/generated/gauges/'
-LABELS_CSV = 'images/generated/labels.csv'
+LABELS_CSV = 'images/generated/gauge_labels.csv'
 
 # Image parameters
 IMG_HEIGHT = 28
@@ -32,7 +32,7 @@ def load_image(image_path):
     return image
 
 images = np.array([load_image(img_path) for img_path in labels_df['filename']])
-labels = labels_df['regression_label'].values.reshape(-1, 1)  # Ensure labels are 2D
+labels = labels_df['label_regression'].values.reshape(-1, 1)  # Ensure labels are 2D
 
 # Reshape images to match TensorFlow input requirements
 images = images.reshape(-1, IMG_HEIGHT, IMG_WIDTH, CHANNELS)

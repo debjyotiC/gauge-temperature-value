@@ -12,7 +12,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 # Paths to images and labels
 IMAGES_PATH = 'images/generated/gauges/'
-LABELS_CSV = 'images/generated/labels.csv'
+LABELS_CSV = 'images/generated/gauge_labels.csv'
 
 # Image parameters
 IMG_HEIGHT = 28
@@ -38,7 +38,7 @@ def load_image(image_path):
 # Load images and labels
 images = np.array([load_image(img_path) for img_path in labels_df['filename']])
 images = np.expand_dims(images, axis=-1)  # Ensure shape (num_samples, 224, 224, 1)
-labels = labels_df['classification_label'].values
+labels = labels_df['label_class'].values
 
 # One-hot encode labels
 label_binarizer = LabelBinarizer()
@@ -62,40 +62,41 @@ train_generator = datagen_train.flow(X_train, y_train, batch_size=BATCH_SIZE)
 test_generator = datagen_test.flow(X_test, y_test, batch_size=BATCH_SIZE)
 
 # Model definition
-# model = tf.keras.models.Sequential([
-#     tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-#     tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
-#     tf.keras.layers.MaxPooling2D((2, 2)),
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
+    tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+
+    tf.keras.layers.Conv2D(20, (5, 5), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+
+    tf.keras.layers.Flatten(),
+
+    tf.keras.layers.Dense(70, activation='relu'),
+    tf.keras.layers.Dropout(0.25),
+    tf.keras.layers.Dense(5, activation='softmax')
+])
+
+
+# classifier_input = tf.keras.layers.Input(shape=(192, 192, 1), name="img")
 #
-#     tf.keras.layers.Conv2D(20, (5, 5), activation='relu'),
-#     tf.keras.layers.MaxPooling2D((2, 2)),
+# x = tf.keras.layers.Conv2D(8, (2, 2), activation='relu', padding='same')(classifier_input)
+# x = tf.keras.layers.MaxPooling2D((2, 2))(x)  # 96x96
 #
-#     tf.keras.layers.Flatten(),
+# x = tf.keras.layers.Conv2D(10, (2, 2), activation='relu', padding='same')(x)
+# x = tf.keras.layers.MaxPooling2D((2, 2))(x)  # 48x48
 #
-#     tf.keras.layers.Dense(70, activation='relu'),
-#     tf.keras.layers.Dropout(0.25),
-#     tf.keras.layers.Dense(6, activation='softmax')
-# ])
+# # x = tf.keras.layers.Conv2D(20, (2, 2), activation='relu', padding='same')(x)
+# # x = tf.keras.layers.MaxPooling2D((2, 2))(x)  # 24x24
+#
+# x = tf.keras.layers.Flatten()(x)  # Much smaller than Flatten
+# x = tf.keras.layers.Dense(32, activation='relu')(x)
+# x = tf.keras.layers.Dropout(0.25)(x)
+# classifier_output = tf.keras.layers.Dense(5, activation='softmax')(x)
+#
+# model = tf.keras.models.Model(inputs=classifier_input, outputs=classifier_output)
 
-
-classifier_input = tf.keras.layers.Input(shape=(28, 28, 1), name="img")
-x = tf.keras.layers.Conv2D(32, (5, 5), activation='relu')(classifier_input)
-x = tf.keras.layers.MaxPooling2D((2, 2))(x)
-
-x = tf.keras.layers.Conv2D(20, (5, 5), activation='relu')(x)
-x = tf.keras.layers.MaxPooling2D((2, 2))(x)
-
-x = tf.keras.layers.Flatten()(x)
-x = tf.keras.layers.Dense(100, activation='relu')(x)
-x = tf.keras.layers.Dropout(0.25)(x)
-classifier_output = tf.keras.layers.Dense(5, activation='softmax')(x)
-
-model = tf.keras.Model(classifier_input, classifier_output, )
-
-model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='categorical_crossentropy',
-              metrics=['accuracy'])
-
-# Print model summary
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 model.summary()
 
 model.save("models/gauge-classifier.keras")

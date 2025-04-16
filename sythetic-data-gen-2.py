@@ -4,9 +4,9 @@ import pandas as pd
 import random
 import os
 
-NEEDLE = 'images/reference/gauge-needle.png'
-GAUGE = 'images/reference/gauge-dial.png'
-NEEDLES_PATH = 'images/generated/needles/needle_rot_{0}.png'
+NEEDLE = 'images/reference/needle-new.png'
+GAUGE = 'images/reference/dial-new.png'
+NEEDLES_PATH = 'images/reference/gauge-needle-new-0.png'
 EDA_GAUGES = 'images/generated/gauges/{0}'
 LABELS_CSV = 'images/generated/labels.csv'
 
