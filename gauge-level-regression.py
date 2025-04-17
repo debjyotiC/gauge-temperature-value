@@ -13,8 +13,8 @@ IMAGES_PATH = 'images/generated/gauges/'
 LABELS_CSV = 'images/generated/gauge_labels.csv'
 
 # Image parameters
-IMG_HEIGHT = 28
-IMG_WIDTH = 28
+IMG_HEIGHT = 162
+IMG_WIDTH = 162
 CHANNELS = 1
 BATCH_SIZE = 20
 
@@ -27,7 +27,7 @@ def load_image(image_path):
     image = Image.open(image_path)
     image = image.convert("L")  # Convert to grayscale
     image = image.filter(ImageFilter.FIND_EDGES)
-    image = image.resize((IMG_WIDTH, IMG_HEIGHT))
+    # image = image.resize((IMG_WIDTH, IMG_HEIGHT))
     image = np.array(image, dtype=np.float32) / 255.0  # Normalize
     return image
 
@@ -60,19 +60,23 @@ test_generator = datagen_test.flow(X_test, y_test, batch_size=BATCH_SIZE)
 
 # Define Model
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)),
-    tf.keras.layers.Conv2D(32, (5, 5), activation='relu'),
+    tf.keras.layers.Input(shape=(162, 162, CHANNELS)),
+
+    tf.keras.layers.Conv2D(4, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
-    tf.keras.layers.Conv2D(20, (5, 5), activation='relu'),
+    tf.keras.layers.Conv2D(8, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+
+    tf.keras.layers.Conv2D(12, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Flatten(),
-
-    tf.keras.layers.Dense(100, activation='relu'),
-    tf.keras.layers.Dropout(0.25),
-    tf.keras.layers.Dense(1)  # Single output neuron for regression
+    tf.keras.layers.Dense(16, activation='relu'),
+    tf.keras.layers.Dense(1)
 ])
+
+
 
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error', metrics=['mae'])  # Mean Absolute Error as additional metric
 
