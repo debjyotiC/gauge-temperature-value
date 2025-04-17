@@ -103,7 +103,7 @@ model.summary()
 
 model.save("models/gauge-classifier.keras")
 
-history = model.fit(train_generator, epochs=500, validation_data=test_generator)
+history = model.fit(train_generator, epochs=50, validation_data=test_generator)
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
