@@ -1,8 +1,9 @@
 import os
-import csv
 import numpy as np
+import pandas as pd
 from PIL import Image
 import matplotlib.pyplot as plt
+import random
 
 # Paths
 NEEDLE = 'images/reference/needle-new.png'
@@ -32,43 +33,54 @@ def get_class_label(value):
     else:
         return 4
 
-# Prepare CSV file
-with open(CSV_PATH, mode='w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(["filename", "label_class", "label_regression"])
+# Generate 500 random readings between 0 and 150 (inclusive)
+num_images = 500
+readings = sorted(random.choices(range(0, 151), k=num_images))
 
-    for reading in range(0, 151):  # 0 to 150 inclusive
-        angle = round(reading * 1.6, 1)  # Regression target (angle)
-        label_class = get_class_label(reading)  # Classification target (0–4)
+# Store label data in a list
+label_data = []
 
-        # Rotate needle
-        needle_img = Image.open(NEEDLE_ZERO).convert('RGBA')
-        rotated = needle_img.rotate(-angle, expand=True, resample=Image.BICUBIC)
-        cropped = rotated.crop((
-            rotated.width // 2 - needle_img.width // 2,
-            rotated.height // 2 - needle_img.height // 2,
-            rotated.width // 2 + needle_img.width // 2,
-            rotated.height // 2 + needle_img.height // 2,
-        ))
+# Generate images and collect label info
+for idx, reading in enumerate(readings):
+    angle = round(reading * 1.6, 1)  # Regression target (angle)
+    label_class = get_class_label(reading)  # Classification target (0–4)
 
-        # Overlay needle on gauge
-        gauge_img = Image.open(GAUGE).convert('RGBA')
-        gauge_with_needle = gauge_img.copy()
-        gauge_with_needle.paste(cropped, (0, 0), cropped)
+    # Rotate needle
+    needle_img = Image.open(NEEDLE_ZERO).convert('RGBA')
+    rotated = needle_img.rotate(-angle, expand=True, resample=Image.BICUBIC)
+    cropped = rotated.crop((
+        rotated.width // 2 - needle_img.width // 2,
+        rotated.height // 2 - needle_img.height // 2,
+        rotated.width // 2 + needle_img.width // 2,
+        rotated.height // 2 + needle_img.height // 2,
+    ))
 
-        # Save image
-        filename = f"gauge_{reading}.png"
-        save_path = os.path.join(OUTPUT_DIR, filename)
-        gauge_with_needle.save(save_path)
+    # Overlay needle on gauge
+    gauge_img = Image.open(GAUGE).convert('RGBA')
+    gauge_with_needle = gauge_img.copy()
+    gauge_with_needle.paste(cropped, (0, 0), cropped)
 
-        # Write CSV: filename, class label, regression angle
-        writer.writerow([filename, label_class, reading])
+    # Save image
+    filename = f"gauge_{idx:04d}.png"
+    save_path = os.path.join(OUTPUT_DIR, filename)
+    gauge_with_needle.save(save_path)
 
-        # Optional: Display
-        plt.clf()
-        plt.axis('off')
-        plt.imshow(gauge_with_needle)
-        plt.title(f"Value: {reading} °C | Class: {label_class}")
-        plt.pause(0.01)
+    # Append to label list
+    label_data.append({
+        "filename": filename,
+        "label_class": label_class,
+        "label_regression": reading
+    })
 
-print(f"All images saved to '{OUTPUT_DIR}' and labels to '{CSV_PATH}'")
+    # Optional: display the image during generation
+    plt.clf()
+    plt.axis('off')
+    plt.imshow(gauge_with_needle)
+    plt.title(f"Value: {reading} °C | Class: {label_class}")
+    plt.pause(0.001)
+
+# Create DataFrame and save CSV
+df = pd.DataFrame(label_data)
+df.to_csv(CSV_PATH, index=False)
+
+print(f"{num_images} images saved to '{OUTPUT_DIR}' and labels to '{CSV_PATH}'")
