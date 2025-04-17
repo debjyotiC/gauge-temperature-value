@@ -50,9 +50,9 @@ X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.
 # Data Augmentation
 datagen_train = tf.keras.preprocessing.image.ImageDataGenerator(
     rotation_range=10,
-    width_shift_range=0.1,
-    height_shift_range=0.1,
-    zoom_range=0.1,
+    # width_shift_range=0.1,
+    # height_shift_range=0.1,
+    # zoom_range=0.1,
     horizontal_flip=True
 )
 
