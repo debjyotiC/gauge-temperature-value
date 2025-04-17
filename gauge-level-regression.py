@@ -83,6 +83,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mea
 # Print the model summary
 model.summary()
 
+model.save("models/gauge-regressor.keras")
 
 history = model.fit(train_generator, epochs=50, validation_data=test_generator)
 
