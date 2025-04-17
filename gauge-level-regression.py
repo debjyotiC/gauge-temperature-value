@@ -84,7 +84,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mea
 model.summary()
 
 
-history = model.fit(train_generator, epochs=500, validation_data=test_generator)
+history = model.fit(train_generator, epochs=50, validation_data=test_generator)
 
 # Evaluate the model
 test_loss, test_mae = model.evaluate(X_test, y_test)
