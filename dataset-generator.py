@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import random
 
 # Paths
-NEEDLE = 'images/reference/needle-new.png'
-GAUGE = 'images/reference/dial-new.png'
-NEEDLE_ZERO = 'images/reference/gauge-needle-new-0.png'
+NEEDLE = 'images/reference/needle.png'
+NEEDLE_2 = 'images/reference/needle-two.png'  # Second needle image
+GAUGE = 'images/reference/gauge.png'
+NEEDLE_ZERO = 'images/reference/needle_rot_0.png'
 OUTPUT_DIR = 'images/generated/gauges'
 CSV_PATH = 'images/generated/gauge_labels.csv'
 
@@ -17,7 +18,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Save needle image for 0°C (starting position)
 image = Image.open(NEEDLE).convert('RGBA')
-image_rot_0 = image.rotate(45, expand=False, resample=Image.BICUBIC)
+image_rot_0 = image.rotate(0, expand=False, resample=Image.BICUBIC)
 image_rot_0.save(NEEDLE_ZERO)
 
 # Define a function to compute classification class (5 bins)
@@ -45,38 +46,51 @@ for idx, reading in enumerate(readings):
     angle = round(reading * 1.6, 1)  # Regression target (angle)
     label_class = get_class_label(reading)  # Classification target (0–4)
 
-    # Rotate needle
+    # Rotate actual needle
     needle_img = Image.open(NEEDLE_ZERO).convert('RGBA')
-    rotated = needle_img.rotate(-angle, expand=True, resample=Image.BICUBIC)
-    cropped = rotated.crop((
-        rotated.width // 2 - needle_img.width // 2,
-        rotated.height // 2 - needle_img.height // 2,
-        rotated.width // 2 + needle_img.width // 2,
-        rotated.height // 2 + needle_img.height // 2,
+    rotated_needle = needle_img.rotate(-angle, expand=True, resample=Image.BICUBIC)
+    cropped_needle = rotated_needle.crop((
+        rotated_needle.width // 2 - needle_img.width // 2,
+        rotated_needle.height // 2 - needle_img.height // 2,
+        rotated_needle.width // 2 + needle_img.width // 2,
+        rotated_needle.height // 2 + needle_img.height // 2,
     ))
 
-    # Overlay needle on gauge
+    # Generate random angle for second needle
+    rand_angle = round(random.uniform(0, 240), 1)
+    needle_2_img = Image.open(NEEDLE_2).convert('RGBA')
+    rotated_needle_2 = needle_2_img.rotate(-rand_angle, expand=True, resample=Image.BICUBIC)
+    cropped_needle_2 = rotated_needle_2.crop((
+        rotated_needle_2.width // 2 - needle_2_img.width // 2,
+        rotated_needle_2.height // 2 - needle_2_img.height // 2,
+        rotated_needle_2.width // 2 + needle_2_img.width // 2,
+        rotated_needle_2.height // 2 + needle_2_img.height // 2,
+    ))
+
+    # Overlay both needles on gauge
     gauge_img = Image.open(GAUGE).convert('RGBA')
-    gauge_with_needle = gauge_img.copy()
-    gauge_with_needle.paste(cropped, (0, 0), cropped)
+    gauge_with_needles = gauge_img.copy()
+    gauge_with_needles.paste(cropped_needle_2, (0, 0), cropped_needle_2)  # Random needle first (behind)
+    gauge_with_needles.paste(cropped_needle, (0, 0), cropped_needle)      # Actual needle on top
 
     # Save image
     filename = f"gauge_{idx:04d}.png"
     save_path = os.path.join(OUTPUT_DIR, filename)
-    gauge_with_needle.save(save_path)
+    gauge_with_needles.save(save_path)
 
     # Append to label list
     label_data.append({
         "filename": filename,
         "label_class": label_class,
-        "label_regression": reading
+        "label_regression": reading,
+        "needle2_angle": rand_angle
     })
 
     # Optional: display the image during generation
     plt.clf()
     plt.axis('off')
-    plt.imshow(gauge_with_needle)
-    plt.title(f"Value: {reading} °C | Class: {label_class}")
+    plt.imshow(gauge_with_needles)
+    plt.title(f"Val: {reading}°C | Class: {label_class} | Needle2: {rand_angle:.1f}°")
     plt.pause(0.001)
 
 # Create DataFrame and save CSV
