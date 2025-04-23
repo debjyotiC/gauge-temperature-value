@@ -37,7 +37,7 @@ def load_image(image_path):
 
 # Load images and labels
 images = np.array([load_image(img_path) for img_path in labels_df['filename']])
-images = np.expand_dims(images, axis=-1)  # Ensure shape (num_samples, 224, 224, 1)
+images = np.expand_dims(images, axis=-1)  # Ensure shape (num_samples, 162, 162, 1)
 labels = labels_df['label_class'].values
 
 # One-hot encode labels
@@ -72,6 +72,9 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Conv2D(12, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+
+    tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
 
     tf.keras.layers.Flatten(),
